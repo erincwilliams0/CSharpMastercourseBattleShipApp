@@ -58,9 +58,18 @@ namespace BattleShipApp
 
             do
             {
-                string shot = AskForShot();
-                (row, column) = GameLogic.SplitShotIntoRowAndColumn(shot);
-                isValidShot = GameLogic.ValidateShot(activePlayer, row, column);
+                string shot = AskForShot(activePlayer);
+                try
+                {
+                    (row, column) = GameLogic.SplitShotIntoRowAndColumn(shot);
+                    isValidShot = GameLogic.ValidateShot(activePlayer, row, column);
+                }
+                catch (Exception ex)
+                {
+
+                    Console.WriteLine(ex.Message);
+                    isValidShot = false;
+                }
 
                 if (isValidShot == false)
                 {
@@ -69,16 +78,29 @@ namespace BattleShipApp
             }
             while (isValidShot == false);
 
-            // Determine shot results
             bool isAHit = GameLogic.IdentifyShotResult(opponent, row, column);
 
-            // Record results
             GameLogic.MarkShotResult(activePlayer, row, column, isAHit);
+
+            DisplayShotResults(row, column, isAHit);
         }
 
-        private static string AskForShot()
+        private static void DisplayShotResults(string row, int column, bool isAHit)
         {
-            Console.Write("Please enter your shot selction: ");
+            if (isAHit)
+            {
+                Console.WriteLine($"{row}{column} is a Hit!");
+            }
+            else
+            {
+                Console.WriteLine($"{row}{column} is a Miss!");
+            }
+            Console.WriteLine();
+        }
+
+        private static string AskForShot(PlayerInfoModel player)
+        {
+            Console.Write($"{ player.UserName }, please enter your shot selction: ");
             string output = Console.ReadLine();
             return output;
         }
@@ -101,18 +123,18 @@ namespace BattleShipApp
                 }
                 else if (gridSpot.Status == GridSpotStatus.Hit)
                 {
-                    Console.Write(" X ");
+                    Console.Write(" X  ");
                 }
                 else if (gridSpot.Status == GridSpotStatus.Miss)
                 {
-                    Console.Write(" O ");
+                    Console.Write(" O  ");
                 }
                 else
                 {
                     Console.Write(" ? ");
                 }
-
             }
+                Console.WriteLine("\n");
         }
 
         private static void WelcomeMessage()
